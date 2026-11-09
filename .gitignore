@@ -1,0 +1,11 @@
+.venv/
+node_modules/
+dist/
+.env
+backend/data/
+infrastructure/passwd
+__pycache__/
+.pytest_cache/
+esp32/**/secrets.h
+*.tsbuildinfo
+.DS_Store

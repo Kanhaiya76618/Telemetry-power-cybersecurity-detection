@@ -1,0 +1,13 @@
+# Mosquitto ACL: each identity may only touch its own topics (least privilege).
+user mec-backend
+topic read campus/+/telemetry
+topic read campus/+/emergency
+topic write campus/+/ack
+topic write campus/+/config
+topic readwrite campus/_probe/#
+
+user node1
+topic write campus/node1/telemetry
+topic write campus/node1/emergency
+topic read campus/node1/ack
+topic read campus/node1/config

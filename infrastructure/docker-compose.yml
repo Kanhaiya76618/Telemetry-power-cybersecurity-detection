@@ -1,0 +1,18 @@
+# Local MQTT broker for development.
+#   docker compose -f infrastructure/docker-compose.yml up -d
+# Port 1883 is published on ALL Mac interfaces so the ESP32 on the same Wi-Fi can reach it.
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.18
+    container_name: esn-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      # Swap to ./mosquitto.secure.conf for shared/lab networks (see docs/setup-guide.md)
+      - ./${MOSQUITTO_CONF:-mosquitto.conf}:/mosquitto/config/mosquitto.conf:ro
+      - ./passwd:/mosquitto/config/passwd:ro
+      - ./acl:/mosquitto/config/acl:ro
+      - mosquitto-data:/mosquitto/data
+volumes:
+  mosquitto-data:
