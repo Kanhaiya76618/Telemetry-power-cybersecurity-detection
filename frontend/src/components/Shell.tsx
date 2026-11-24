@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Activity, BarChart3, Bell, BellOff, BellRing, Cpu, History, LayoutDashboard, Menu, Network, Radio, Settings as Cog,
-  ShieldAlert, Siren, Volume2, X,
+  Search, ShieldAlert, Siren, Volume2, X,
 } from 'lucide-react'
 import { useMonitor } from '../hooks/useMonitor'
 import type { PageId } from '../types'
@@ -141,6 +141,10 @@ export function TopBar({ onMenu, alarm, go }: {
           <Badge tone={backendOk ? 'green' : conn === 'connecting' ? 'amber' : 'red'} dot>Backend {conn === 'open' ? 'live' : conn}</Badge>
         </div>
         <div className="ml-auto flex items-center gap-2">
+          <button onClick={() => window.dispatchEvent(new Event('esn:palette'))} title="Search pages and actions (⌘K)"
+            className="hidden items-center gap-2 rounded-full px-3 py-1.5 text-xs text-slate-400 ring-1 ring-white/10 hover:bg-white/5 hover:text-slate-200 sm:flex">
+            <Search size={14} /><span>Search</span><kbd className="rounded bg-white/5 px-1.5 font-mono text-[10px]">⌘K</kbd>
+          </button>
           {/* compact mobile status: always keep the emergency indicator visible */}
           <span className={cx('h-2.5 w-2.5 rounded-full md:hidden', critical ? 'animate-pulseRed bg-crit' : backendOk ? 'bg-safe' : 'bg-warn')} />
           {critical && (

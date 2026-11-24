@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FlaskConical, Minus, Play, Plus, RotateCcw, Square, Zap } from 'lucide-react'
+import { FlaskConical, Minus, Play, Plus, RotateCcw, Sparkles, Square, Zap } from 'lucide-react'
 import { api } from '../services/api'
 import { useMonitor } from '../hooks/useMonitor'
 import { Badge, Button, Card } from './ui'
@@ -16,6 +16,9 @@ export function SimulationPanel() {
   return (
     <Card title="Demo Simulation" icon={<FlaskConical size={14} />} action={<Badge tone={running ? 'violet' : 'slate'} dot pulse={running}>{running ? `Running · ${sim?.node}` : 'Stopped'}</Badge>}>
       <p className="mb-3 text-xs text-slate-500">Synthetic readings on <span className="font-mono text-violet-300">{sim?.node ?? 'node1-sim'}</span>, processed by the same backend detection logic and clearly labelled as simulated.</p>
+      <Button tone="primary" className="mb-4 w-full !bg-violet-500/15 !text-violet-200 !ring-violet-400/40 hover:!bg-violet-500/25" onClick={() => window.dispatchEvent(new Event('esn:demo'))}>
+        <Sparkles size={15} />Guided demo — full emergency story in 1 minute
+      </Button>
       <div className="mb-3 flex items-baseline gap-3">
         <span className="font-mono text-3xl font-bold text-violet-300">{sim ? sim.temp_c.toFixed(1) : '--'}°C</span>
         <span className="text-xs text-slate-500">target {sim?.target_c.toFixed(1) ?? '--'}°C · {sim?.humidity.toFixed(0) ?? '--'}% RH</span>

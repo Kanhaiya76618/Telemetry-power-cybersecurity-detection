@@ -139,8 +139,20 @@ void connectWiFiNonBlocking() {
   // give each attempt 20 s: phone hotspots can be slow to finish the handshake
   if (lastWifiAttempt != 0 && now - lastWifiAttempt < RECONNECT_INTERVAL_MS * 4) return;
   lastWifiAttempt = now;
-  Serial.printf("[WiFi] connecting to \"%s\" ...\n", WIFI_SSID);
   WiFi.disconnect();
+  // Diagnostics: list visible networks (ESP32 sees 2.4 GHz only) and whether our target is among them
+  int n = WiFi.scanNetworks();
+  bool found = false;
+  Serial.printf("[WiFi] %d network(s) visible (2.4 GHz only):\n", n < 0 ? 0 : n);
+  for (int i = 0; i < n && i < 15; i++) {
+    bool match = WiFi.SSID(i) == WIFI_SSID;
+    found |= match;
+    Serial.printf("   %-28s %4d dBm  ch %2d%s\n", WiFi.SSID(i).c_str(), WiFi.RSSI(i), WiFi.channel(i), match ? "  <-- target" : "");
+  }
+  WiFi.scanDelete();
+  if (!found) Serial.printf("[WiFi] \"%s\" NOT visible -> hotspot is 5 GHz only, off, or the name differs\n", WIFI_SSID);
+  esp_task_wdt_reset();
+  Serial.printf("[WiFi] connecting to \"%s\" ...\n", WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
 
@@ -325,9 +337,16 @@ void setup() {
   Serial.printf("[BOOT] last reset reason: %s\n", resetReasonText());
   // Hardware task watchdog: reboot automatically if loop() stops running for 30 s.
   esp_task_wdt_config_t wdt = {.timeout_ms = 30000, .idle_core_mask = 0, .trigger_panic = true};
-  esp_task_wdt_reconfigure(&wdt);
+  if (esp_task_wdt_reconfigure(&wdt) != ESP_OK) esp_task_wdt_init(&wdt);  // init if not yet running
   esp_task_wdt_add(NULL);
   WiFi.mode(WIFI_STA);
+  WiFi.onEvent([](WiFiEvent_t, WiFiEventInfo_t info) {
+    uint8_t r = info.wifi_sta_disconnected.reason;
+    const char* why = (r == 201) ? "network not found (5 GHz / off / wrong name)"
+                    : (r == 15 || r == 202 || r == 204 || r == 2) ? "WRONG PASSWORD or security mode"
+                    : "see ESP-IDF reason codes";
+    Serial.printf("[WiFi] connect failed, reason %u: %s\n", r, why);
+  }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   WiFi.setAutoReconnect(true);
   mqtt.setServer(MQTT_SERVER, MQTT_PORT);
   mqtt.setCallback(onMqttMessage);

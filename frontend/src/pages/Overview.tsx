@@ -3,6 +3,8 @@ import { useMonitor } from '../hooks/useMonitor'
 import { HumidityCard, TemperatureGauge } from '../components/Gauges'
 import { LiveChart } from '../components/LiveChart'
 import { SimulationPanel } from '../components/SimulationPanel'
+import { SetupGuide } from '../components/SetupGuide'
+import { DataFlow } from '../components/DataFlow'
 import { AlertTable } from '../components/AlertTable'
 import { Card, Stat } from '../components/ui'
 import type { PageId } from '../types'
@@ -18,6 +20,7 @@ export default function Overview({ go }: { go: (p: PageId) => void }) {
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div className="xl:col-span-12"><DataFlow go={go} /></div>
       <div className="xl:col-span-4"><TemperatureGauge node={node} settings={settings} /></div>
       <div className="flex flex-col gap-4 xl:col-span-8">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -29,7 +32,7 @@ export default function Overview({ go }: { go: (p: PageId) => void }) {
         <HumidityCard node={node} history={hum} />
       </div>
       <div className="xl:col-span-8"><LiveChart node={focusNode} /></div>
-      <div className="xl:col-span-4"><SimulationPanel /></div>
+      <div className="flex flex-col gap-4 xl:col-span-4"><SetupGuide /><SimulationPanel /></div>
       <div className="xl:col-span-12">
         <Card title="Recent alerts" action={<button onClick={() => go('history')} className="text-xs text-tele hover:underline">Full history →</button>}>
           <AlertTable alerts={recent} empty="No alerts since this dashboard opened" />

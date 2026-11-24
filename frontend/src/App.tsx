@@ -9,6 +9,9 @@ import { Analytics, LiveMonitoring } from './pages/Monitoring'
 import { AlertHistory, EmergencyAlerts } from './pages/Alerts'
 import { DevicesPage, NetworkPage, SettingsPage } from './pages/Infra'
 import SecurityPage from './pages/Security'
+import { Toasts } from './components/Toasts'
+import { GuidedDemo } from './components/GuidedDemo'
+import { CommandPalette } from './components/CommandPalette'
 import type { PageId } from './types'
 
 function usePage(): [PageId, (p: PageId) => void] {
@@ -68,6 +71,9 @@ function Dashboard() {
       </div>
       <EmergencyOverlay alert={top} settings={settings} alarm={alarm} onView={() => go('live')}
         onMinimize={() => top && setMinimized((m) => new Set([...m, top.id]))} />
+      <Toasts />
+      <GuidedDemo />
+      <CommandPalette go={go} />
       <AudioGate open={gate && !alarm.unlocked} onEnable={async () => { await alarm.enableAudio(); setGate(false) }} onSkip={() => setGate(false)} />
     </div>
   )
